@@ -1,0 +1,39 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+	<PropertyGroup>
+		<TargetFramework>net8.0</TargetFramework>
+		<ImplicitUsings>enable</ImplicitUsings>
+		<Nullable>enable</Nullable>
+		<AssemblyName>DevInstance.WebServiceToolkit.Database</AssemblyName>
+		<RootNamespace>DevInstance.WebServiceToolkit.Database</RootNamespace>
+		<Copyright>Copyright 2024 DevInstance LLC</Copyright>
+		<Company>DevInstance LLC</Company>
+		<Authors>Yuriy Frankiv</Authors>
+		<Version>8.0.1</Version>
+		<AssemblyVersion>8.0.1.0</AssemblyVersion>
+		<FileVersion>8.0.1.0</FileVersion>
+		<Title>WebService Toolkit Database</Title>
+		<PackageIcon>icon.png</PackageIcon>
+		<PackageReadmeFile>README.md</PackageReadmeFile>
+		<RepositoryUrl>https://github.com/devInstance/WebServiceToolkit</RepositoryUrl>
+		<PackageLicenseFile>LICENSE</PackageLicenseFile>
+		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	</PropertyGroup>
+
+	<ItemGroup>
+	  <None Include="..\..\..\WebServiceToolkit\icon.png">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\..\WebServiceToolkit\LICENSE">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	  <None Include="..\..\..\WebServiceToolkit\README.md">
+	    <Pack>True</Pack>
+	    <PackagePath>\</PackagePath>
+	  </None>
+	</ItemGroup>
+
+</Project>
