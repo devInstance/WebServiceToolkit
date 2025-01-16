@@ -6,7 +6,7 @@
 		<Nullable>enable</Nullable>
 		<AssemblyName>DevInstance.WebServiceToolkit.Database</AssemblyName>
 		<RootNamespace>DevInstance.WebServiceToolkit.Database</RootNamespace>
-		<Copyright>Copyright 2024 DevInstance LLC</Copyright>
+		<Copyright>Copyright 2024-2025 DevInstance LLC</Copyright>
 		<Company>DevInstance LLC</Company>
 		<Authors>Yuriy Frankiv</Authors>
 		<Version>8.0.1</Version>
@@ -19,6 +19,7 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Description></Description>
 	</PropertyGroup>
 
 	<ItemGroup>

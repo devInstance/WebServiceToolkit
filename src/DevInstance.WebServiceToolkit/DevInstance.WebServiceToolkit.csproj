@@ -6,12 +6,12 @@
 		<Nullable>enable</Nullable>
 		<AssemblyName>DevInstance.WebServiceToolkit</AssemblyName>
 		<RootNamespace>DevInstance.WebServiceToolkit</RootNamespace>
-		<Copyright>Copyright 2024 DevInstance LLC</Copyright>
+		<Copyright>Copyright 2024-2025 DevInstance LLC</Copyright>
 		<Company>DevInstance LLC</Company>
 		<Authors>Yuriy Frankiv</Authors>
-		<Version>8.1.0</Version>
-		<AssemblyVersion>8.1.0.0</AssemblyVersion>
-		<FileVersion>8.1.0.0</FileVersion>
+		<Version>8.2.0</Version>
+		<AssemblyVersion>8.2.0.0</AssemblyVersion>
+		<FileVersion>8.2.0.0</FileVersion>
 		<Title>WebService Toolkit</Title>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -19,6 +19,7 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+		<Description></Description>
 	</PropertyGroup>
 
 	<ItemGroup>
