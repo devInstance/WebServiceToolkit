@@ -33,6 +33,38 @@ public static class ServiceConfigurationExtensions
                        && !t.IsAbstract
                        && t.GetCustomAttribute<WebServiceAttribute>() != null);
 
+        return AddScopedTypes(services, types);
+    }
+
+    /// <summary>
+    /// Registers all classes with the WebServiceMockAttribute as services in the DI container.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add the services to.</param>
+    /// <returns>The IServiceCollection with the registered services.</returns>
+    public static IServiceCollection AddServerWebServicesMocks(this IServiceCollection services)
+    {
+        return AddServerWebServicesMocks(services, Assembly.GetCallingAssembly());
+    }
+
+    /// <summary>
+    /// Registers all classes with the WebServiceMockAttribute as services in the DI container.
+    /// </summary>
+    /// <param name="services">The IServiceCollection to add the services to.</param>
+    /// <returns>The IServiceCollection with the registered services.</returns>
+    public static IServiceCollection AddServerWebServicesMocks(this IServiceCollection services, Assembly assembly)
+    {
+        // 1. Get all types from the given assembly
+        var types = assembly
+           .GetTypes()
+           .Where(t => t.IsClass
+                       && !t.IsAbstract
+                       && t.GetCustomAttribute<WebServiceMockAttribute>() != null);
+
+        return AddScopedTypes(services, types);
+    }
+
+    private static IServiceCollection AddScopedTypes(IServiceCollection services, IEnumerable<Type> types)
+    {
         foreach (var type in types)
         {
             // 2. Get all interfaces the class implements
