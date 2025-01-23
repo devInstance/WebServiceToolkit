@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.1</TargetFramework>
+    <Nullable>enable</Nullable>
+
+	  <AssemblyName>DevInstance.WebServiceToolkit.Common</AssemblyName>
+	  <RootNamespace>DevInstance.WebServiceToolkit.Common</RootNamespace>
+	  <Copyright>Copyright 2025 DevInstance LLC</Copyright>
+	  <Company>DevInstance LLC</Company>
+	  <Authors>Yuriy Frankiv</Authors>
+	  <Version>2.1.0</Version>
+	  <AssemblyVersion>2.1.0.0</AssemblyVersion>
+	  <FileVersion>2.1.0.0</FileVersion>
+	  <Title>WebService Toolkit Common</Title>
+	  <PackageIcon>icon.png</PackageIcon>
+	  <RepositoryUrl>https://github.com/devInstance/WebServiceToolkit</RepositoryUrl>
+	  <PackageLicenseFile>LICENSE</PackageLicenseFile>
+	  <PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
+	  <GeneratePackageOnBuild>True</GeneratePackageOnBuild>
+	  <Description></Description>
+
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\..\icon.png" Link="icon.png">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+    <None Include="..\..\LICENSE" Link="LICENSE">
+      <PackagePath>\</PackagePath>
+      <Pack>True</Pack>
+    </None>
+  </ItemGroup>
+
+</Project>

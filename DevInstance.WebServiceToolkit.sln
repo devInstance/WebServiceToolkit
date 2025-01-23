@@ -7,6 +7,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevInstance.WebServiceToolk
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevInstance.WebServiceToolkit", "src\DevInstance.WebServiceToolkit\DevInstance.WebServiceToolkit.csproj", "{ACB6518A-977A-61D0-22C4-FC6F38091E12}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DevInstance.WebServiceToolkit.Common", "src\DevInstance.WebServiceToolkit.Common\DevInstance.WebServiceToolkit.Common.csproj", "{4598FCA6-51A6-40BC-8E38-D068CABE22F6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{ACB6518A-977A-61D0-22C4-FC6F38091E12}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{ACB6518A-977A-61D0-22C4-FC6F38091E12}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{ACB6518A-977A-61D0-22C4-FC6F38091E12}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4598FCA6-51A6-40BC-8E38-D068CABE22F6}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4598FCA6-51A6-40BC-8E38-D068CABE22F6}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4598FCA6-51A6-40BC-8E38-D068CABE22F6}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4598FCA6-51A6-40BC-8E38-D068CABE22F6}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
