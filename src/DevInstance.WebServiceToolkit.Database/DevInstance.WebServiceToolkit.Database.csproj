@@ -9,9 +9,9 @@
 		<Copyright>Copyright 2024-2025 DevInstance LLC</Copyright>
 		<Company>DevInstance LLC</Company>
 		<Authors>Yuriy Frankiv</Authors>
-		<Version>8.0.1</Version>
-		<AssemblyVersion>8.0.1.0</AssemblyVersion>
-		<FileVersion>8.0.1.0</FileVersion>
+		<Version>8.0.2</Version>
+		<AssemblyVersion>8.0.2.0</AssemblyVersion>
+		<FileVersion>8.0.2.0</FileVersion>
 		<Title>WebService Toolkit Database</Title>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
