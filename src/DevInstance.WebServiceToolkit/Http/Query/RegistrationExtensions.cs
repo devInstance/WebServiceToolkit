@@ -2,9 +2,8 @@
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
-using System.Linq;
 
-namespace DevInstance.WebServiceToolkit.Querying;
+namespace DevInstance.WebServiceToolkit.Http.Query;
 
 public static class RegistrationExtensions
 {
@@ -12,7 +11,7 @@ public static class RegistrationExtensions
     /// Registers the [QueryModel] MVC model binder provider.
     /// Works regardless of when AddControllers() is called (order-independent).
     /// </summary>
-    public static IServiceCollection AddWebServiceToolkitQuerying(this IServiceCollection services)
+    public static IServiceCollection AddWebServiceToolkitQuery(this IServiceCollection services)
     {
         // Configure MvcOptions at the container level.
         services.TryAddEnumerable(ServiceDescriptor.Transient<IConfigureOptions<MvcOptions>, QueryModelMvcConfigureOptions>());
@@ -22,18 +21,18 @@ public static class RegistrationExtensions
     /// <summary>
     /// Convenience overload to chain from AddControllers().
     /// </summary>
-    public static IMvcBuilder AddWebServiceToolkitQuerying(this IMvcBuilder builder)
+    public static IMvcBuilder AddWebServiceToolkitQuery(this IMvcBuilder builder)
     {
-        builder.Services.AddWebServiceToolkitQuerying();
+        builder.Services.AddWebServiceToolkitQuery();
         // Also allow opting-in via AddMvcOptions for explicitness if desired.
-        builder.AddMvcOptions(o => o.UseWebServiceToolkitQuerying());
+        builder.AddMvcOptions(o => o.UseWebServiceToolkitQuery());
         return builder;
     }
 
     /// <summary>
     /// Low-level hook to insert the provider directly from MvcOptions.
     /// </summary>
-    public static MvcOptions UseWebServiceToolkitQuerying(this MvcOptions options)
+    public static MvcOptions UseWebServiceToolkitQuery(this MvcOptions options)
     {
         if (!options.ModelBinderProviders.Any(p => p is QueryModelBinderProvider))
         {
@@ -46,6 +45,6 @@ public static class RegistrationExtensions
     // Internal: options configurator that safely inserts the provider once.
     private sealed class QueryModelMvcConfigureOptions : IConfigureOptions<MvcOptions>
     {
-        public void Configure(MvcOptions options) => options.UseWebServiceToolkitQuerying();
+        public void Configure(MvcOptions options) => options.UseWebServiceToolkitQuery();
     }
 }

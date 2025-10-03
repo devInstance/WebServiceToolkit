@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace DevInstance.WebServiceToolkit.Querying;
+namespace DevInstance.WebServiceToolkit.Http.Query;
 
 public sealed class QueryModelBindException : Exception
 {

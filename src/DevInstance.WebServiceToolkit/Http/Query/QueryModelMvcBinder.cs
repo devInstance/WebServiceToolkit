@@ -1,10 +1,7 @@
-﻿using DevInstance.WebServiceToolkit.Common.Querying;
-using Microsoft.AspNetCore.Mvc.ModelBinding;
-using System.Collections.Generic;
+﻿using Microsoft.AspNetCore.Mvc.ModelBinding;
 using System.Reflection;
-using System.Threading.Tasks;
 
-namespace DevInstance.WebServiceToolkit.Querying;
+namespace DevInstance.WebServiceToolkit.Http.Query;
 
 public sealed class QueryModelMvcBinder : IModelBinder
 {

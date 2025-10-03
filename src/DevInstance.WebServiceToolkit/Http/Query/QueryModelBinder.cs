@@ -1,15 +1,10 @@
-﻿using DevInstance.WebServiceToolkit.Common.Querying;
-using Microsoft.AspNetCore.Http;
-using NoCrast.Server.WebService.Common.Querying;
-using System;
+﻿using Microsoft.AspNetCore.Http;
 using System.Collections;
-using System.Collections.Generic;
 using System.ComponentModel;
 using System.Globalization;
-using System.Linq;
 using System.Reflection;
 
-namespace DevInstance.WebServiceToolkit.Querying;
+namespace DevInstance.WebServiceToolkit.Http.Query;
 
 public static class QueryModelBinder
 {

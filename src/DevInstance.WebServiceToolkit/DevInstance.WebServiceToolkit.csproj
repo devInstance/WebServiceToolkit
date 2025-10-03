@@ -27,7 +27,8 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DevInstance.WebServiceToolkit.Database" Version="8.0.1" />
+		<PackageReference Include="DevInstance.WebServiceToolkit.Common" Version="9.0.0" />
+		<PackageReference Include="DevInstance.WebServiceToolkit.Database" Version="9.0.0" />
 	</ItemGroup>
 	
 	<ItemGroup>
@@ -43,10 +44,6 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-	</ItemGroup>
-	
-	<ItemGroup>
-	  <ProjectReference Include="..\DevInstance.WebServiceToolkit.Common\DevInstance.WebServiceToolkit.Common.csproj" />
 	</ItemGroup>
 
 </Project>
