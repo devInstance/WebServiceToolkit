@@ -1,7 +1,7 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net8.0</TargetFramework>
+		<TargetFramework>net9.0</TargetFramework>
 		<ImplicitUsings>enable</ImplicitUsings>
 		<Nullable>enable</Nullable>
 		<AssemblyName>DevInstance.WebServiceToolkit</AssemblyName>
@@ -9,9 +9,9 @@
 		<Copyright>Copyright 2024-2025 DevInstance LLC</Copyright>
 		<Company>DevInstance LLC</Company>
 		<Authors>Yuriy Frankiv</Authors>
-		<Version>8.3.0</Version>
-		<AssemblyVersion>8.3.0.0</AssemblyVersion>
-		<FileVersion>8.3.0.0</FileVersion>
+		<Version>9.0.0</Version>
+		<AssemblyVersion>9.0.0.0</AssemblyVersion>
+		<FileVersion>9.0.0.0</FileVersion>
 		<Title>WebService Toolkit</Title>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -27,9 +27,9 @@
 	</ItemGroup>
 
 	<ItemGroup>
-	  <PackageReference Include="DevInstance.WebServiceToolkit.Database" Version="8.0.1" />
+		<PackageReference Include="DevInstance.WebServiceToolkit.Database" Version="8.0.1" />
 	</ItemGroup>
-
+	
 	<ItemGroup>
 		<None Include="..\..\..\WebServiceToolkit\icon.png">
 			<Pack>True</Pack>
@@ -43,6 +43,10 @@
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
+	</ItemGroup>
+	
+	<ItemGroup>
+	  <ProjectReference Include="..\DevInstance.WebServiceToolkit.Common\DevInstance.WebServiceToolkit.Common.csproj" />
 	</ItemGroup>
 
 </Project>
