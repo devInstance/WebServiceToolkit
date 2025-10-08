@@ -1,0 +1,58 @@
+
+trigger: none
+pr: none
+
+parameters:
+  - name: packageVersion
+    displayName: NuGet Package Version
+    type: string
+    default: '9.0.1'
+
+pool: default
+
+variables:
+  solution: '**/DevInstance.WebServiceToolkit.sln'
+  version: ${{ parameters.packageVersion }}
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  artifactName: 'drop'
+  nugetFeedUrl: 'https://www.nuget.org/packages/DevInstance.BlazorToolkit/'
+
+steps:
+# Step 1: Restore NuGet Packages  
+- task: UseDotNet@2
+  displayName: 'Use .NET 9.x'
+  inputs:
+    version: 9.x
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+
+# Step 2: Build the Solution and pack NuGet Package
+- task: DotNetCoreCLI@2
+  displayName: 'Build project'
+  inputs:
+    command: 'build'
+    projects: '**/*.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+# Step 3: Push NuGet Package
+- task: DotNetCoreCLI@2
+  displayName: 'Pack NuGet package'
+  inputs:
+    command: 'pack'
+    packagesToPack: '$(solution)'
+    versioningScheme: 'byEnvVar'
+    versionEnvVar: 'version'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Push with API Key'
+  inputs:
+    command: 'custom'
+    custom: 'nuget'
+    arguments: 'push $(Build.ArtifactStagingDirectory)/**/*.nupkg --source https://api.nuget.org/v3/index.json --api-key $(NuGetApiKey)'

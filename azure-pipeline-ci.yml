@@ -1,0 +1,32 @@
+trigger:
+- master
+
+pool: default
+
+variables:
+  solution: '**/DevInstance.WebServiceToolkit.sln'
+  buildConfiguration: 'Release'
+  nugetFeedUrl: 'https://www.nuget.org/packages/DevInstance.BlazorToolkit/'  # For internal feeds
+  # nugetApiKey: $(NuGetApiKey)  # Store this in pipeline secrets  
+
+steps:
+# Step 1: Restore NuGet Packages
+# Step 1: Restore NuGet Packages  
+- task: UseDotNet@2
+  displayName: 'Use .NET 9.x'
+  inputs:
+    version: 9.x
+
+- task: NuGetToolInstaller@1
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '**/*.sln'
+
+# Step 2: Build the Solution
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    msbuildArgs: '/p:Configuration=$(buildConfiguration)'
+
