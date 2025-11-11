@@ -1,4 +1,6 @@
-﻿namespace DevInstance.WebServiceToolkit.Common.Model;
+﻿using System;
+
+namespace DevInstance.WebServiceToolkit.Common.Model;
 
 /// <summary>
 /// Represents a list of models with pagination, sorting, and filtering capabilities.
@@ -44,11 +46,13 @@ public class ModelList<T>
     /// <summary>
     /// Gets or sets the filter value.
     /// </summary>
+    [Obsolete]
     public int Filter { get; set; }
 
     /// <summary>
     /// Gets or sets the fields to include in the response.
     /// </summary>
+    [Obsolete]
     public int Fields { get; set; }
 
     /// <summary>
