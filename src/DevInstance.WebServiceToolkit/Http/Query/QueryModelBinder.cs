@@ -6,9 +6,35 @@ using System.Reflection;
 
 namespace DevInstance.WebServiceToolkit.Http.Query;
 
+/// <summary>
+/// Provides methods to bind query string parameters to classes marked with <see cref="QueryModelAttribute"/>.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This class is the core engine for parsing HTTP query strings into strongly-typed POCO objects.
+/// It supports various data types including primitives, dates, enums, and collections.
+/// </para>
+/// <para>
+/// For ASP.NET Core MVC integration, use <see cref="RegistrationExtensions.AddWebServiceToolkitQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection)"/>
+/// to register automatic model binding.
+/// </para>
+/// </remarks>
 public static class QueryModelBinder
 {
-    /// <summary>Bind a [QueryModel] POCO from HttpRequest.Query or throw QueryModelBindException.</summary>
+    /// <summary>
+    /// Binds query string parameters from an HTTP request to a new instance of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The query model type marked with <see cref="QueryModelAttribute"/>.</typeparam>
+    /// <param name="request">The HTTP request containing query parameters.</param>
+    /// <returns>A new instance of <typeparamref name="T"/> populated with values from the query string.</returns>
+    /// <exception cref="ArgumentNullException">Thrown when <paramref name="request"/> is null.</exception>
+    /// <exception cref="InvalidOperationException">Thrown when <typeparamref name="T"/> is not marked with <see cref="QueryModelAttribute"/>.</exception>
+    /// <exception cref="QueryModelBindException">Thrown when one or more parameters fail to bind.</exception>
+    /// <example>
+    /// <code>
+    /// var query = QueryModelBinder.Bind&lt;ProductQuery&gt;(HttpContext.Request);
+    /// </code>
+    /// </example>
     public static T Bind<T>(HttpRequest request) where T : new()
     {
         if (request is null) throw new ArgumentNullException(nameof(request));
@@ -21,7 +47,28 @@ public static class QueryModelBinder
         return model;
     }
 
-    /// <summary>Try to bind a [QueryModel] POCO from HttpRequest.Query.</summary>
+    /// <summary>
+    /// Attempts to bind query string parameters from an HTTP request to a new instance of type <typeparamref name="T"/>.
+    /// </summary>
+    /// <typeparam name="T">The query model type marked with <see cref="QueryModelAttribute"/>.</typeparam>
+    /// <param name="request">The HTTP request containing query parameters.</param>
+    /// <param name="model">When this method returns, contains the populated model instance.</param>
+    /// <param name="errors">When this method returns false, contains a dictionary of parameter names to error messages.</param>
+    /// <returns><c>true</c> if binding was successful; otherwise, <c>false</c>.</returns>
+    /// <example>
+    /// <code>
+    /// if (QueryModelBinder.TryBind&lt;ProductQuery&gt;(request, out var query, out var errors))
+    /// {
+    ///     // Use query
+    /// }
+    /// else
+    /// {
+    ///     // Handle errors
+    ///     foreach (var error in errors)
+    ///         Console.WriteLine($"{error.Key}: {error.Value}");
+    /// }
+    /// </code>
+    /// </example>
     public static bool TryBind<T>(HttpRequest request, out T model, out IReadOnlyDictionary<string, string> errors)
         where T : new()
     {

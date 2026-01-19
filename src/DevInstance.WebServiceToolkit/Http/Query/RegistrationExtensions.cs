@@ -5,6 +5,29 @@ using Microsoft.Extensions.Options;
 
 namespace DevInstance.WebServiceToolkit.Http.Query;
 
+/// <summary>
+/// Provides extension methods for registering query model binding services in the dependency injection container.
+/// </summary>
+/// <remarks>
+/// <para>
+/// Use these extension methods in your application startup to enable automatic binding
+/// of query string parameters to classes marked with <see cref="QueryModelAttribute"/>.
+/// </para>
+/// </remarks>
+/// <example>
+/// <code>
+/// // In Program.cs
+/// var builder = WebApplication.CreateBuilder(args);
+///
+/// // Option 1: Chain from AddControllers
+/// builder.Services.AddControllers()
+///     .AddWebServiceToolkitQuery();
+///
+/// // Option 2: Separate registration
+/// builder.Services.AddControllers();
+/// builder.Services.AddWebServiceToolkitQuery();
+/// </code>
+/// </example>
 public static class RegistrationExtensions
 {
     /// <summary>

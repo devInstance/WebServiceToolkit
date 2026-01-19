@@ -3,8 +3,26 @@ using System.Reflection;
 
 namespace DevInstance.WebServiceToolkit.Http.Query;
 
+/// <summary>
+/// ASP.NET Core MVC model binder that binds query string parameters to classes marked with <see cref="QueryModelAttribute"/>.
+/// </summary>
+/// <remarks>
+/// <para>
+/// This binder uses <see cref="QueryModelBinder.TryBind{T}"/> internally and adds any binding errors
+/// to the MVC ModelState for validation handling.
+/// </para>
+/// <para>
+/// This binder is automatically used when <see cref="QueryModelBinderProvider"/> is registered
+/// via <see cref="RegistrationExtensions.AddWebServiceToolkitQuery(Microsoft.Extensions.DependencyInjection.IServiceCollection)"/>.
+/// </para>
+/// </remarks>
 public sealed class QueryModelMvcBinder : IModelBinder
 {
+    /// <summary>
+    /// Attempts to bind query string parameters to the model.
+    /// </summary>
+    /// <param name="ctx">The model binding context.</param>
+    /// <returns>A completed task representing the asynchronous binding operation.</returns>
     public Task BindModelAsync(ModelBindingContext ctx)
     {
         var t = ctx.ModelType;

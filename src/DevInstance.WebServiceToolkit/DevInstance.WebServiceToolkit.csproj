@@ -19,7 +19,7 @@
 		<PackageLicenseFile>LICENSE</PackageLicenseFile>
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
-		<Description></Description>
+		<Description>ASP.NET Core utilities for web service development including query model binding, exception handling, and service registration.</Description>
 	</PropertyGroup>
 
 	<ItemGroup>
@@ -32,15 +32,15 @@
 	</ItemGroup>
 	
 	<ItemGroup>
-		<None Include="..\..\..\WebServiceToolkit\icon.png">
+		<None Include="..\..\icon.png" Link="icon.png">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="..\..\..\WebServiceToolkit\LICENSE">
+		<None Include="..\..\LICENSE" Link="LICENSE">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
-		<None Include="..\..\..\WebServiceToolkit\README.md">
+		<None Include="README.md">
 			<Pack>True</Pack>
 			<PackagePath>\</PackagePath>
 		</None>
