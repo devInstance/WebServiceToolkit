@@ -14,9 +14,9 @@ WebServiceToolkit is a .NET library designed to simplify the development of ASP.
 
 | Package | Version | Description |
 |---------|---------|-------------|
-| [DevInstance.WebServiceToolkit](https://www.nuget.org/packages/DevInstance.WebServiceToolkit) | 10.0.0 | Main package with ASP.NET Core integration |
+| [DevInstance.WebServiceToolkit](https://www.nuget.org/packages/DevInstance.WebServiceToolkit) | 10.0.1 | Main package with ASP.NET Core integration |
 | [DevInstance.WebServiceToolkit.Common](https://www.nuget.org/packages/DevInstance.WebServiceToolkit.Common) | 10.0.1 | Common models and attributes (no ASP.NET Core dependency) |
-| [DevInstance.WebServiceToolkit.Database](https://www.nuget.org/packages/DevInstance.WebServiceToolkit.Database) | 10.0.0 | Database query interfaces |
+| [DevInstance.WebServiceToolkit.Database](https://www.nuget.org/packages/DevInstance.WebServiceToolkit.Database) | 10.0.1 | Database query interfaces |
 
 ## Prerequisites
 
