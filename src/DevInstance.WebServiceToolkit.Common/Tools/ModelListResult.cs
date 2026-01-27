@@ -1,5 +1,6 @@
 ﻿using DevInstance.WebServiceToolkit.Common.Model;
 using System;
+using System.Globalization;
 
 namespace DevInstance.WebServiceToolkit.Common.Tools;
 
@@ -47,8 +48,11 @@ public static class ModelListResult
     /// <param name="totalCount">The total number of items available across all pages. If null, the length of items is used.</param>
     /// <param name="top">The maximum number of items per page. If null or less than or equal to zero, pagination is not applied.</param>
     /// <param name="page">The zero-based index of the current page. If null, defaults to the first page.</param>
+    /// <param name="sortBy">The field by which to sort the items. If null, no sorting is applied.</param>
+    /// <param name="isAsc">Indicates whether the sorting should be ascending. If null, defaults to true (ascending).</param>
+    /// <param name="search">The search term to filter the items. If null, no filtering is applied.</param>
     /// <returns>A ModelList<T> instance containing the specified items and pagination information.</returns>
-    public static ModelList<T> CreateList<T>(T[] items, int? totalCount = null, int? top = null, int? page = null)
+    public static ModelList<T> CreateList<T>(T[] items, int? totalCount = null, int? top = null, int? page = null, string sortBy = null, bool? isAsc = null, string search = null)
     {
         var totalItemsCount = totalCount ?? items.Length;
 
@@ -73,6 +77,9 @@ public static class ModelListResult
             Count = items.Length,
             PagesCount = totalPageCount,
             Page = pageIndex,
+            SortBy = sortBy,
+            IsAsc = isAsc ?? true,
+            Search = search,
             Items = items
         };
     }
