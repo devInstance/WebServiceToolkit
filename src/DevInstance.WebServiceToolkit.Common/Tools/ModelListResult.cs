@@ -1,4 +1,5 @@
 ﻿using DevInstance.WebServiceToolkit.Common.Model;
+using System;
 
 namespace DevInstance.WebServiceToolkit.Common.Tools;
 
@@ -34,4 +35,46 @@ public static class ModelListResult
             TotalCount = 1,
         };
     }
+
+    /// <summary>
+    /// Creates a new instance of the ModelList<T> class containing the specified items and optional pagination
+    /// metadata.
+    /// </summary>
+    /// <remarks>If the specified page index exceeds the total number of pages, the last page is used. The
+    /// method does not perform validation on the contents of the items array.</remarks>
+    /// <typeparam name="T">The type of elements in the list.</typeparam>
+    /// <param name="items">The array of items to include in the list. Cannot be null.</param>
+    /// <param name="totalCount">The total number of items available across all pages. If null, the length of items is used.</param>
+    /// <param name="top">The maximum number of items per page. If null or less than or equal to zero, pagination is not applied.</param>
+    /// <param name="page">The zero-based index of the current page. If null, defaults to the first page.</param>
+    /// <returns>A ModelList<T> instance containing the specified items and pagination information.</returns>
+    public static ModelList<T> CreateList<T>(T[] items, int? totalCount = null, int? top = null, int? page = null)
+    {
+        var totalItemsCount = totalCount ?? items.Length;
+
+        var pageIndex = 0;
+        var totalPageCount = 1;
+        if (top.HasValue && top.Value > 0)
+        {
+            totalPageCount = (int)Math.Ceiling((double)totalItemsCount / (double)top.Value);
+        }
+        if (page.HasValue && page.Value >= 0)
+        {
+            pageIndex = page.Value;
+            if (pageIndex >= totalPageCount)
+            {
+                pageIndex = totalPageCount - 1;
+            }
+        }
+
+        return new ModelList<T>()
+        {
+            TotalCount = totalItemsCount,
+            Count = items.Length,
+            PagesCount = totalPageCount,
+            Page = pageIndex,
+            Items = items
+        };
+    }
+
 }
