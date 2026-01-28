@@ -9,9 +9,9 @@
 		<Copyright>Copyright 2024-2025 DevInstance LLC</Copyright>
 		<Company>DevInstance LLC</Company>
 		<Authors>Yuriy Frankiv</Authors>
-		<Version>10.0.3</Version>
-		<AssemblyVersion>10.0.3.0</AssemblyVersion>
-		<FileVersion>10.0.3.0</FileVersion>
+		<Version>10.0.4</Version>
+		<AssemblyVersion>10.0.4.0</AssemblyVersion>
+		<FileVersion>10.0.4.0</FileVersion>
 		<Title>WebService Toolkit</Title>
 		<PackageIcon>icon.png</PackageIcon>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
@@ -27,7 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DevInstance.WebServiceToolkit.Common" Version="10.0.3" />
+		<PackageReference Include="DevInstance.WebServiceToolkit.Common" Version="10.0.4" />
 		<PackageReference Include="DevInstance.WebServiceToolkit.Database" Version="10.0.2" />
 	</ItemGroup>
 	
