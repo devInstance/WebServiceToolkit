@@ -40,7 +40,15 @@ steps:
     projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
-# Step 3: Push NuGet Package
+# Step 3: Run Unit Tests
+- task: DotNetCoreCLI@2
+  displayName: 'Run unit tests'
+  inputs:
+    command: 'test'
+    projects: '**/tests/**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-build'
+
+# Step 4: Push NuGet Package
 - task: DotNetCoreCLI@2
   displayName: 'Pack NuGet package'
   inputs:

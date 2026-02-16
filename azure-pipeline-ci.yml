@@ -30,3 +30,11 @@ steps:
     solution: '$(solution)'
     msbuildArgs: '/p:Configuration=$(buildConfiguration)'
 
+# Step 3: Run Unit Tests
+- task: DotNetCoreCLI@2
+  displayName: 'Run unit tests'
+  inputs:
+    command: 'test'
+    projects: '**/tests/**/*.csproj'
+    arguments: '--configuration $(buildConfiguration) --no-build'
+
