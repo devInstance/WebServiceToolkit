@@ -37,22 +37,30 @@ public static class ModelListResult
         };
     }
 
+
     /// <summary>
-    /// Creates a new instance of the ModelList<T> class containing the specified items and optional pagination
-    /// metadata.
+    /// Creates a paginated list of items with optional sorting and search capabilities, returning a ModelList<T> that
+    /// includes pagination metadata and the resulting items.
     /// </summary>
-    /// <remarks>If the specified page index exceeds the total number of pages, the last page is used. The
-    /// method does not perform validation on the contents of the items array.</remarks>
-    /// <typeparam name="T">The type of elements in the list.</typeparam>
-    /// <param name="items">The array of items to include in the list. Cannot be null.</param>
-    /// <param name="totalCount">The total number of items available across all pages. If null, the length of items is used.</param>
-    /// <param name="top">The maximum number of items per page. If null or less than or equal to zero, pagination is not applied.</param>
-    /// <param name="page">The zero-based index of the current page. If null, defaults to the first page.</param>
-    /// <param name="sortBy">The field by which to sort the items. If null, no sorting is applied.</param>
-    /// <param name="isAsc">Indicates whether the sorting should be ascending. If null, defaults to true (ascending).</param>
-    /// <param name="search">The search term to filter the items. If null, no filtering is applied.</param>
-    /// <returns>A ModelList<T> instance containing the specified items and pagination information.</returns>
-    public static ModelList<T> CreateList<T>(T[] items, int? totalCount = null, int? top = null, int? page = null, string sortBy = null, bool? isAsc = null, string search = null)
+    /// <remarks>If useSearchMarkup is set to true and a search term is provided, occurrences of the search
+    /// term within string properties of the items are wrapped in <mark> tags for highlighting. The method does not
+    /// perform actual filtering; it only highlights matches. The returned ModelList<T> includes metadata such as total
+    /// item count, page count, current page, sort order, and search term for client-side use.</remarks>
+    /// <typeparam name="T">The type of the items contained in the list.</typeparam>
+    /// <param name="items">An array of items to include in the resulting list. Cannot be null.</param>
+    /// <param name="totalCount">The total number of items available across all pages. If not specified, the length of the items array is used.</param>
+    /// <param name="top">The maximum number of items to include per page. If not specified or less than or equal to zero, all items are
+    /// included in a single page.</param>
+    /// <param name="page">The zero-based index of the page to retrieve. If the specified page exceeds the total number of pages, the last
+    /// page is returned.</param>
+    /// <param name="sortOrder">An array of strings specifying the sort order for the items. Each string typically represents a property name
+    /// and sort direction. The sort direction is represented by a prefix "+" for ascending or "-" for descending.</param>
+    /// <param name="search">A search term used to filter or highlight items. If specified, items containing the search term may be
+    /// highlighted depending on the value of useSearchMarkup.</param>
+    /// <param name="useSearchMarkup">true to highlight occurrences using <mark>...</mark> tags of the search term within item properties using markup; otherwise, false.</param>
+    /// <returns>A ModelList<T> containing the paginated, optionally sorted and searched items, along with pagination and search
+    /// metadata.</returns>
+    public static ModelList<T> CreateList<T>(T[] items, int? totalCount = null, int? top = null, int? page = null, string[] sortOrder = null, string search = null, bool useSearchMarkup = false)
     {
         var totalItemsCount = totalCount ?? items.Length;
 
@@ -71,14 +79,68 @@ public static class ModelListResult
             }
         }
 
+        if(useSearchMarkup && !string.IsNullOrEmpty(search))
+        {
+            var searchTerm = search.Trim();
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                for (int i = 0; i < items.Length; i++)
+                {
+                    var item = items[i];
+                    if (item == null) continue;
+
+                    var type = typeof(T);
+                    var properties = type.GetProperties(System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+
+                    foreach (var prop in properties)
+                    {
+                        if (!prop.CanRead || !prop.CanWrite) continue;
+
+                        var value = prop.GetValue(item);
+                        if (value == null) continue;
+
+                        var valueString = value.ToString();
+                        if (string.IsNullOrEmpty(valueString)) continue;
+
+                        if (valueString.Contains(searchTerm, StringComparison.OrdinalIgnoreCase))
+                        {
+                            // Wrap the matching term in <mark> tags for highlighting
+                            var highlightedString = System.Text.RegularExpressions.Regex.Replace(
+                                valueString,
+                                System.Text.RegularExpressions.Regex.Escape(searchTerm),
+                                match => $"<mark>{match.Value}</mark>",
+                                System.Text.RegularExpressions.RegexOptions.IgnoreCase);
+
+                            try
+                            {
+                                var propertyType = prop.PropertyType;
+                                if (propertyType == typeof(string))
+                                {
+                                    prop.SetValue(item, highlightedString);
+                                }
+                                else
+                                {
+                                    var convertedValue = Convert.ChangeType(highlightedString, propertyType, CultureInfo.InvariantCulture);
+                                    prop.SetValue(item, convertedValue);
+                                }
+                            }
+                            catch
+                            {
+                                // If conversion fails, keep the original value
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
         return new ModelList<T>()
         {
             TotalCount = totalItemsCount,
             Count = items.Length,
             PagesCount = totalPageCount,
             Page = pageIndex,
-            SortBy = sortBy,
-            IsAsc = isAsc ?? true,
+            SortOrder = sortOrder,
             Search = search,
             Items = items
         };

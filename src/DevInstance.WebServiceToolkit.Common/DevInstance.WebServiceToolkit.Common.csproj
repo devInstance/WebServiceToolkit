@@ -8,9 +8,9 @@
 		<Copyright>Copyright 2025 - 2026 devInstance LLC</Copyright>
 		<Company>DevInstance LLC</Company>
 		<Authors>Yuriy Frankiv</Authors>
-		<Version>10.0.4</Version>
-		<AssemblyVersion>10.0.4.0</AssemblyVersion>
-		<FileVersion>10.0.4.0</FileVersion>
+		<Version>10.1.0</Version>
+		<AssemblyVersion>10.1.0.0</AssemblyVersion>
+		<FileVersion>10.1.0.0</FileVersion>
 		<Title>WebService Toolkit Common</Title>
 		<PackageIcon>icon.png</PackageIcon>
 		<RepositoryUrl>https://github.com/devInstance/WebServiceToolkit</RepositoryUrl>

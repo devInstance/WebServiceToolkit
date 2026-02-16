@@ -232,3 +232,6 @@ src/PhotoShaRa.WebCore/wwwroot/lib
 opencv
 
 src/$Recycle.Bin
+
+# Claude Code local settings
+.claude/settings.local.json

@@ -27,8 +27,7 @@ namespace DevInstance.WebServiceToolkit.Common.Model;
 ///     PagesCount = (int)Math.Ceiling(totalProducts / (double)pageSize),
 ///     Page = currentPage,
 ///     Count = products.Length,
-///     SortBy = "Name",
-///     IsAsc = true
+///     SortOrder = new[] { "+Name" }
 /// };
 /// </code>
 /// </example>
@@ -59,15 +58,35 @@ public class ModelList<T>
     public int Count { get; set; }
 
     /// <summary>
+    /// Gets or sets the order in which items are sorted.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// The SortOrder property defines the sorting sequence as an array of strings.
+    /// Each string represents a sorting criterion with the following format:
+    /// </para>
+    /// <list type="bullet">
+    /// <item><description>A "+" prefix indicates ascending order</description></item>
+    /// <item><description>A "-" prefix indicates descending order</description></item>
+    /// <item><description>The position in the array determines the sorting priority (first element has highest priority)</description></item>
+    /// </list>
+    /// <para>
+    /// Ensure that the array is not null or empty to avoid unexpected behavior during sorting operations.
+    /// </para>
+    /// </remarks>
+    public string[] SortOrder { get; set; }
+    /// <summary>
     /// Gets or sets the name of the column used for sorting.
     /// </summary>
     /// <value>The property name by which the results are sorted, or null if not sorted.</value>
+    [Obsolete("This property is deprecated and will be removed in a future version. Use the SortOrder property in the request model instead.")]
     public string SortBy { get; set; }
 
     /// <summary>
     /// Gets or sets a value indicating whether the sort order is ascending.
     /// </summary>
     /// <value><c>true</c> if sorted in ascending order; <c>false</c> for descending order.</value>
+    [Obsolete("This property is deprecated and will be removed in a future version. Use the SortOrder property in the request model instead.")]
     public bool IsAsc { get; set; }
 
     /// <summary>
