@@ -27,7 +27,7 @@
 	</ItemGroup>
 
 	<ItemGroup>
-		<PackageReference Include="DevInstance.WebServiceToolkit.Common" Version="10.0.4" />
+		<PackageReference Include="DevInstance.WebServiceToolkit.Common" Version="10.1.0" />
 		<PackageReference Include="DevInstance.WebServiceToolkit.Database" Version="10.0.2" />
 	</ItemGroup>
 	
