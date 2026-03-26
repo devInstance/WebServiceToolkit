@@ -64,6 +64,32 @@ var response = new ModelList<Product>
 | `IsAsc` | `bool` | True if ascending sort order |
 | `Search` | `string` | Applied search query |
 
+**Static Methods:**
+
+| Method | Description |
+|--------|-------------|
+| `ModelList<T>.Empty()` | Creates an empty list with all counts set to zero |
+| `ModelList<T>.Single(T item)` | Creates a list containing a single item |
+| `ModelList<T>.FromArray(T[] items)` | Creates a list from an array with all items in one page |
+| `ModelList<T>.IsEmpty(ModelList<T> list)` | Returns `true` if the list is null or has no items |
+
+```csharp
+// Empty list
+var empty = ModelList<Product>.Empty();
+
+// Single item
+var single = ModelList<Product>.Single(product);
+
+// From array (all items in one page)
+var list = ModelList<Product>.FromArray(products);
+
+// Check if empty or null
+if (ModelList<Product>.IsEmpty(list))
+{
+    // handle empty case
+}
+```
+
 ### ModelListResult
 
 Utility class for creating `ModelList<T>` instances.

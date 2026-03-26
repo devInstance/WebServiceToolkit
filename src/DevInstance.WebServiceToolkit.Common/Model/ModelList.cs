@@ -114,4 +114,65 @@ public class ModelList<T>
     /// </summary>
     /// <value>An array of items of type <typeparamref name="T"/>.</value>
     public T[] Items { get; set; }
+
+    /// <summary>
+    /// Determines whether the specified <see cref="ModelList{T}"/> is null or contains no items.
+    /// </summary>
+    /// <param name="list">The list to check.</param>
+    /// <returns><c>true</c> if <paramref name="list"/> is null or has no items; otherwise, <c>false</c>.</returns>
+    public static bool IsEmpty(ModelList<T> list)
+    {
+        return list == null || list.Items == null || list.Items.Length == 0;
+    }
+
+    /// <summary>
+    /// Creates an empty <see cref="ModelList{T}"/> with no items and all counts set to zero.
+    /// </summary>
+    /// <returns>An empty <see cref="ModelList{T}"/>.</returns>
+    public static ModelList<T> Empty()
+    {
+        return new ModelList<T>
+        {
+            Count = 0,
+            Items = Array.Empty<T>(),
+            Page = 0,
+            PagesCount = 0,
+            TotalCount = 0,
+        };
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ModelList{T}"/> containing a single item.
+    /// </summary>
+    /// <param name="item">The item to wrap in a list response.</param>
+    /// <returns>A <see cref="ModelList{T}"/> with counts set to 1.</returns>
+    public static ModelList<T> Single(T item)
+    {
+        return new ModelList<T>
+        {
+            Count = 1,
+            Items = new T[] { item },
+            Page = 1,
+            PagesCount = 1,
+            TotalCount = 1,
+        };
+    }
+
+    /// <summary>
+    /// Creates a <see cref="ModelList{T}"/> from an array with all items in a single page.
+    /// </summary>
+    /// <param name="items">The array of items.</param>
+    /// <returns>A <see cref="ModelList{T}"/> containing all items in one page.</returns>
+    public static ModelList<T> FromArray(T[] items)
+    {
+        var length = items?.Length ?? 0;
+        return new ModelList<T>
+        {
+            Count = length,
+            Items = items ?? Array.Empty<T>(),
+            Page = length > 0 ? 1 : 0,
+            PagesCount = length > 0 ? 1 : 0,
+            TotalCount = length,
+        };
+    }
 }
