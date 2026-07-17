@@ -1,4 +1,5 @@
-﻿using DevInstance.WebServiceToolkit.Exceptions;
+﻿using DevInstance.LogScope;
+using DevInstance.WebServiceToolkit.Exceptions;
 using Microsoft.AspNetCore.Mvc;
 
 namespace DevInstance.WebServiceToolkit.Controllers;
@@ -48,8 +49,9 @@ public static class ControllerUtils
     /// <returns>A task representing the asynchronous operation, containing an action result with a value of type <typeparamref name="T"/>.</returns>
     public delegate Task<ActionResult<T>> WebHandlerAsync<T>();
 
-    private static ActionResult<T> HandleException<T>(ControllerBase controller, Exception ex)
+    private static ActionResult<T> HandleException<T>(ControllerBase controller, Exception ex, IScopeLog log)
     {
+        log.E(ex);
         return controller.Problem(detail: ex.StackTrace, title: ex.Message);
     }
 
@@ -79,7 +81,7 @@ public static class ControllerUtils
     /// }
     /// </code>
     /// </example>
-    public static async Task<ActionResult<T>> HandleWebRequestAsync<T>(this ControllerBase controller, WebHandlerAsync<T> handler)
+    public static async Task<ActionResult<T>> HandleWebRequestAsync<T>(this ControllerBase controller, WebHandlerAsync<T> handler, IScopeLog log = null)
     {
         try
         {
@@ -87,23 +89,27 @@ public static class ControllerUtils
         }
         catch (RecordNotFoundException)
         {
+            log.I("Request not found");
             return controller.NotFound();
         }
         catch (RecordConflictException)
         {
+            log.I("Record conflict request");
             return controller.Conflict();
         }
         catch (UnauthorizedException ex)
         {
+            log.I("Unauthorized request");
             return controller.Unauthorized(ex.Message);
         }
         catch (BadRequestException ex)
         {
+            log.I("Bad request");
             return controller.BadRequest(ex.Message);
         }
         catch (Exception ex)
         {
-            return HandleException<T>(controller, ex);
+            return HandleException<T>(controller, ex, log);
         }
     }
 
@@ -132,7 +138,7 @@ public static class ControllerUtils
     /// }
     /// </code>
     /// </example>
-    public static ActionResult<T> HandleWebRequest<T>(this ControllerBase controller, WebHandler<T> handler)
+    public static ActionResult<T> HandleWebRequest<T>(this ControllerBase controller, WebHandler<T> handler, IScopeLog log = null)
     {
         try
         {
@@ -140,23 +146,27 @@ public static class ControllerUtils
         }
         catch (RecordNotFoundException)
         {
+            log.I("Request not found");
             return controller.NotFound();
         }
         catch (RecordConflictException)
         {
+            log.I("Record conflict request");
             return controller.Conflict();
         }
         catch (UnauthorizedException ex)
         {
+            log.I("Unauthorized request");
             return controller.Unauthorized(ex.Message);
         }
         catch (BadRequestException ex)
         {
+            log.I("Bad request");
             return controller.BadRequest(ex.Message);
         }
         catch (Exception ex)
         {
-            return HandleException<T>(controller, ex);
+            return HandleException<T>(controller, ex, log);
         }
     }
 }
