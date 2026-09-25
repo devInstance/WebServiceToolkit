@@ -263,7 +263,8 @@ public class ProductService : IProductService
 ### Paginated Results
 
 ```csharp
-public async Task<ModelList<Product>> GetProductsAsync(ProductQueryParams queryParams)
+// ProductList implements IModelList<Product>; see Pagination.
+public async Task<ProductList> GetProductsAsync(ProductQueryParams queryParams)
 {
     var query = _query.Clone()
         .Search(queryParams.Search)
@@ -280,15 +281,14 @@ public async Task<ModelList<Product>> GetProductsAsync(ProductQueryParams queryP
         .Take(queryParams.PageSize)
         .ToListAsync();
 
-    return new ModelList<Product>
+    return new ProductList
     {
         Items = items.ToArray(),
         TotalCount = totalCount,
         PagesCount = (int)Math.Ceiling(totalCount / (double)queryParams.PageSize),
         Page = queryParams.Page,
         Count = items.Count,
-        SortBy = query.SortedBy,
-        IsAsc = query.IsAsc,
+        SortOrder = new[] { (query.IsAsc ? "+" : "-") + query.SortedBy },
         Search = queryParams.Search
     };
 }

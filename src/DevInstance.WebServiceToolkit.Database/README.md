@@ -221,12 +221,12 @@ public class ProductQuery :
 }
 ```
 
-## Integration with ModelList
+## Integration with IModelList
 
-Use these query interfaces with `ModelList<T>` from the Common package:
+Use these query interfaces with an `IModelList<T>` implementation from the Common package (here `ProductList : IModelList<Product>`):
 
 ```csharp
-public async Task<ModelList<Product>> GetProductsAsync(int page, int pageSize, string search, string sortBy, bool isAsc)
+public async Task<ProductList> GetProductsAsync(int page, int pageSize, string search, string sortBy, bool isAsc)
 {
     var query = _productQuery
         .Search(search)
@@ -239,21 +239,17 @@ public async Task<ModelList<Product>> GetProductsAsync(int page, int pageSize, s
         .Take(pageSize)
         .ExecuteAsync();
 
-    return new ModelList<Product>
-    {
-        Items = items.ToArray(),
-        TotalCount = totalCount,
-        PagesCount = (int)Math.Ceiling(totalCount / (double)pageSize),
-        Page = page,
-        Count = items.Count,
-        SortBy = sortBy,
-        IsAsc = isAsc,
-        Search = search
-    };
+    return ModelListResult.CreateList<ProductList, Product>(
+        items.ToArray(),
+        totalCount: totalCount,
+        top: pageSize,
+        page: page,
+        sortOrder: new[] { (isAsc ? "+" : "-") + sortBy },
+        search: search);
 }
 ```
 
 ## See Also
 
 - [DevInstance.WebServiceToolkit](https://www.nuget.org/packages/DevInstance.WebServiceToolkit) - Main package with ASP.NET Core integration
-- [DevInstance.WebServiceToolkit.Common](https://www.nuget.org/packages/DevInstance.WebServiceToolkit.Common) - Common models including ModelList<T>
+- [DevInstance.WebServiceToolkit.Common](https://www.nuget.org/packages/DevInstance.WebServiceToolkit.Common) - Common models including IModelItem and IModelList<T>

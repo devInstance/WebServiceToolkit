@@ -1,16 +1,18 @@
 # Pagination
 
-WebServiceToolkit provides `ModelList<T>` for building paginated API responses.
+WebServiceToolkit provides the `IModelList<T>` contract and `ModelListResult` helpers for building paginated API responses.
+
+> **Note:** The `ModelList<T>` class is obsolete. Define your own response type that implements `IModelList<T>` instead. `ModelList<T>` still implements the interface, so existing code keeps working while you migrate.
 
 ## Overview
 
-`ModelList<T>` is a wrapper class that includes:
+`IModelList<T>` describes a response that includes:
 - The items for the current page
 - Pagination metadata (page, total count, page count)
-- Sort information
+- Sort order
 - Search term
 
-## ModelList<T> Properties
+## IModelList<T> Properties
 
 | Property | Type | Description |
 |----------|------|-------------|
@@ -19,16 +21,55 @@ WebServiceToolkit provides `ModelList<T>` for building paginated API responses.
 | `PagesCount` | `int` | Total number of pages |
 | `Page` | `int` | Current page index (zero-based) |
 | `Count` | `int` | Number of items in current page |
-| `SortBy` | `string` | Column used for sorting |
-| `IsAsc` | `bool` | True if ascending order |
+| `SortOrder` | `string[]` | Sort criteria: `"+Name"` ascending, `"-Name"` descending; array order is sort priority |
 | `Search` | `string` | Applied search query |
+
+## Defining a List Response Type
+
+Implement `IModelList<T>` once per item type (or once generically) and use it as your response DTO:
+
+```csharp
+using DevInstance.WebServiceToolkit.Common.Model;
+
+public class ProductList : IModelList<Product>
+{
+    public int TotalCount { get; set; }
+    public int PagesCount { get; set; }
+    public int Page { get; set; }
+    public int Count { get; set; }
+    public string[] SortOrder { get; set; }
+    public string Search { get; set; }
+    public Product[] Items { get; set; }
+}
+```
+
+A single generic implementation works too:
+
+```csharp
+public class PagedList<T> : IModelList<T>
+{
+    public int TotalCount { get; set; }
+    public int PagesCount { get; set; }
+    public int Page { get; set; }
+    public int Count { get; set; }
+    public string[] SortOrder { get; set; }
+    public string Search { get; set; }
+    public T[] Items { get; set; }
+}
+```
+
+The examples below use `ProductList`.
 
 ## Basic Usage
 
 ### Creating a Paginated Response
 
+`ModelListResult.CreateList<TList, T>()` fills any `IModelList<T>` implementation and calculates the page count for you:
+
 ```csharp
-public async Task<ModelList<Product>> GetProductsAsync(int page, int pageSize)
+using DevInstance.WebServiceToolkit.Common.Tools;
+
+public async Task<ProductList> GetProductsAsync(int page, int pageSize)
 {
     var allProducts = await _repository.GetAllAsync();
 
@@ -38,21 +79,31 @@ public async Task<ModelList<Product>> GetProductsAsync(int page, int pageSize)
         .Take(pageSize)
         .ToArray();
 
-    return new ModelList<Product>
-    {
-        Items = items,
-        TotalCount = totalCount,
-        PagesCount = (int)Math.Ceiling(totalCount / (double)pageSize),
-        Page = page,
-        Count = items.Length
-    };
+    return ModelListResult.CreateList<ProductList, Product>(
+        items,
+        totalCount: totalCount,
+        top: pageSize,
+        page: page);
 }
+```
+
+You can also populate the response directly:
+
+```csharp
+return new ProductList
+{
+    Items = items,
+    TotalCount = totalCount,
+    PagesCount = (int)Math.Ceiling(totalCount / (double)pageSize),
+    Page = page,
+    Count = items.Length
+};
 ```
 
 ### With Sorting and Search
 
 ```csharp
-public async Task<ModelList<Product>> GetProductsAsync(
+public async Task<ProductList> GetProductsAsync(
     int page,
     int pageSize,
     string search,
@@ -86,23 +137,28 @@ public async Task<ModelList<Product>> GetProductsAsync(
         .Take(pageSize)
         .ToArrayAsync();
 
-    return new ModelList<Product>
-    {
-        Items = items,
-        TotalCount = totalCount,
-        PagesCount = (int)Math.Ceiling(totalCount / (double)pageSize),
-        Page = page,
-        Count = items.Length,
-        SortBy = sortBy,
-        IsAsc = isAscending,
-        Search = search
-    };
+    return ModelListResult.CreateList<ProductList, Product>(
+        items,
+        totalCount: totalCount,
+        top: pageSize,
+        page: page,
+        sortOrder: sortBy == null ? null : new[] { (isAscending ? "+" : "-") + sortBy },
+        search: search);
 }
+```
+
+### Highlighting Search Matches
+
+Pass `useSearchMarkup: true` to wrap occurrences of the search term in the items' string properties with `<mark>` tags. This only highlights; it does not filter:
+
+```csharp
+return ModelListResult.CreateList<ProductList, Product>(items, search: "widget", useSearchMarkup: true);
+// "Blue Widget" becomes "Blue <mark>Widget</mark>"
 ```
 
 ## Query Model Integration
 
-Combine `ModelList<T>` with query models for clean controller endpoints:
+Combine `IModelList<T>` with query models for clean controller endpoints:
 
 ### Query Model
 
@@ -133,9 +189,9 @@ public class ProductQuery
 
 ```csharp
 [HttpGet]
-public Task<ActionResult<ModelList<Product>>> GetProducts(ProductQuery query)
+public Task<ActionResult<ProductList>> GetProducts(ProductQuery query)
 {
-    return this.HandleWebRequestAsync<ModelList<Product>>(async () =>
+    return this.HandleWebRequestAsync<ProductList>(async () =>
     {
         var result = await _productService.GetProductsAsync(
             query.Page,
@@ -163,29 +219,28 @@ GET /api/products?page=0&pageSize=10&search=widget&sort=name
   "pagesCount": 3,
   "page": 0,
   "count": 10,
-  "sortBy": "name",
-  "isAsc": true,
+  "sortOrder": ["+name"],
   "search": "widget"
 }
 ```
 
 ## Single Item Response
 
-Use `ModelListResult.SingleItemList()` to wrap a single item:
+Use `ModelListResult.SingleItemList<TList, T>()` to wrap a single item:
 
 ```csharp
 using DevInstance.WebServiceToolkit.Common.Tools;
 
 [HttpGet("{id}")]
-public Task<ActionResult<ModelList<Product>>> GetProduct(string id)
+public Task<ActionResult<ProductList>> GetProduct(string id)
 {
-    return this.HandleWebRequestAsync<ModelList<Product>>(async () =>
+    return this.HandleWebRequestAsync<ProductList>(async () =>
     {
         var product = await _productService.GetByIdAsync(id);
         if (product == null)
             throw new RecordNotFoundException(id);
 
-        return Ok(ModelListResult.SingleItemList(product));
+        return Ok(ModelListResult.SingleItemList<ProductList, Product>(product));
     });
 }
 ```
@@ -220,20 +275,30 @@ If your API uses one-based pages, adjust the calculation:
 // Page 1 = first page
 var items = query.Skip((page - 1) * pageSize).Take(pageSize);
 
-return new ModelList<Product>
+return new ProductList
 {
     Page = page,  // Return the 1-based page number
     // ...
 };
 ```
 
+Note that `ModelListResult.CreateList` treats `page` as zero-based, so populate the response directly when using one-based pages.
+
 ### Cursor-Based Pagination
 
-For cursor-based pagination, you might extend `ModelList<T>`:
+For cursor-based pagination, add cursor properties to your `IModelList<T>` implementation:
 
 ```csharp
-public class CursorModelList<T> : ModelList<T>
+public class CursorPagedList<T> : IModelList<T>
 {
+    public int TotalCount { get; set; }
+    public int PagesCount { get; set; }
+    public int Page { get; set; }
+    public int Count { get; set; }
+    public string[] SortOrder { get; set; }
+    public string Search { get; set; }
+    public T[] Items { get; set; }
+
     public string? NextCursor { get; set; }
     public string? PreviousCursor { get; set; }
 }
@@ -278,7 +343,7 @@ var totalCount = items.Count;
 Always return full pagination metadata so clients can build UI:
 
 ```csharp
-return new ModelList<Product>
+return new ProductList
 {
     Items = items,
     TotalCount = totalCount,    // For "Showing 1-20 of 150"
@@ -291,11 +356,11 @@ return new ModelList<Product>
 ### 4. Handle Empty Results
 
 ```csharp
-public async Task<ModelList<Product>> GetProductsAsync(ProductQuery query)
+public async Task<ProductList> GetProductsAsync(ProductQuery query)
 {
     var items = await ExecuteQueryAsync(query);
 
-    return new ModelList<Product>
+    return new ProductList
     {
         Items = items.ToArray(),
         TotalCount = items.Any() ? await CountAsync(query) : 0,
@@ -319,13 +384,22 @@ var itemsTask = baseQuery.Clone().Skip(skip).Take(take).ToListAsync();
 
 await Task.WhenAll(countTask, itemsTask);
 
-return new ModelList<Product>
+return new ProductList
 {
     Items = itemsTask.Result.ToArray(),
     TotalCount = countTask.Result,
     // ...
 };
 ```
+
+## Migrating from ModelList<T>
+
+1. Define a type that implements `IModelList<T>` (for example `ProductList` or a generic `PagedList<T>`).
+2. Replace `new ModelList<Product> { ... }` with `new ProductList { ... }`.
+3. Replace `ModelListResult.CreateList(items, ...)` with `ModelListResult.CreateList<ProductList, Product>(items, ...)`, and `ModelListResult.SingleItemList(item)` with `ModelListResult.SingleItemList<ProductList, Product>(item)`.
+4. Replace the obsolete `SortBy` / `IsAsc` properties with `SortOrder` (for example `new[] { "+Name" }`).
+
+The JSON shape is unchanged apart from the obsolete properties, so clients reading `items`, `totalCount`, `pagesCount`, `page`, `count`, `sortOrder` and `search` keep working.
 
 ## See Also
 

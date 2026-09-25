@@ -56,19 +56,33 @@ app.Run();
 
 ### 2. Create a Model
 
-Create a model class that inherits from `ModelItem`:
+Create a model class that implements `IModelItem`, and a list response type that implements `IModelList<T>`:
 
 ```csharp
 using DevInstance.WebServiceToolkit.Common.Model;
 
-public class Product : ModelItem
+public class Product : IModelItem
 {
+    public string Id { get; set; }
     public string Name { get; set; }
     public string Description { get; set; }
     public decimal Price { get; set; }
     public string Category { get; set; }
 }
+
+public class ProductList : IModelList<Product>
+{
+    public int TotalCount { get; set; }
+    public int PagesCount { get; set; }
+    public int Page { get; set; }
+    public int Count { get; set; }
+    public string[] SortOrder { get; set; }
+    public string Search { get; set; }
+    public Product[] Items { get; set; }
+}
 ```
+
+> `ModelItem` and `ModelList<T>` are obsolete. Implement `IModelItem` and `IModelList<T>` on your own types instead.
 
 ### 3. Create a Query Model
 
@@ -105,11 +119,12 @@ Create a service interface and implementation:
 
 ```csharp
 using DevInstance.WebServiceToolkit.Common.Model;
+using DevInstance.WebServiceToolkit.Common.Tools;
 using DevInstance.WebServiceToolkit.Tools;
 
 public interface IProductService
 {
-    Task<ModelList<Product>> GetProductsAsync(ProductQuery query);
+    Task<ProductList> GetProductsAsync(ProductQuery query);
     Task<Product?> GetByIdAsync(string id);
     Task<Product> CreateAsync(CreateProductRequest request);
     Task<Product> UpdateAsync(string id, UpdateProductRequest request);
@@ -126,22 +141,18 @@ public class ProductService : IProductService
         _repository = repository;
     }
 
-    public async Task<ModelList<Product>> GetProductsAsync(ProductQuery query)
+    public async Task<ProductList> GetProductsAsync(ProductQuery query)
     {
         var products = await _repository.QueryAsync(query);
         var totalCount = await _repository.CountAsync(query);
 
-        return new ModelList<Product>
-        {
-            Items = products.ToArray(),
-            TotalCount = totalCount,
-            PagesCount = (int)Math.Ceiling(totalCount / (double)query.PageSize),
-            Page = query.Page,
-            Count = products.Count,
-            SortBy = query.SortBy,
-            IsAsc = query.IsAscending,
-            Search = query.Search
-        };
+        return ModelListResult.CreateList<ProductList, Product>(
+            products.ToArray(),
+            totalCount: totalCount,
+            top: query.PageSize,
+            page: query.Page,
+            sortOrder: query.SortBy == null ? null : new[] { (query.IsAscending ? "+" : "-") + query.SortBy },
+            search: query.Search);
     }
 
     public async Task<Product?> GetByIdAsync(string id)
@@ -175,9 +186,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public Task<ActionResult<ModelList<Product>>> GetProducts(ProductQuery query)
+    public Task<ActionResult<ProductList>> GetProducts(ProductQuery query)
     {
-        return this.HandleWebRequestAsync<ModelList<Product>>(async () =>
+        return this.HandleWebRequestAsync<ProductList>(async () =>
         {
             var products = await _productService.GetProductsAsync(query);
             return Ok(products);

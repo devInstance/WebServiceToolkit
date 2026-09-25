@@ -12,13 +12,46 @@ dotnet add package DevInstance.WebServiceToolkit.Common
 
 This package provides:
 
-- **Model classes** for API responses (`ModelItem`, `ModelList<T>`)
+- **Model interfaces** for API responses (`IModelItem`, `IModelList<T>`)
+- **Legacy model classes** (`ModelItem`, `ModelList<T>`) — obsolete, kept for backward compatibility
 - **Query model attributes** for parameter binding (`[QueryModel]`, `[QueryName]`)
 - **Utility methods** for creating model responses
 
 ## API Reference
 
-### ModelItem
+### IModelItem
+
+Contract for entities with a server-assigned unique identifier.
+
+```csharp
+public class Product : IModelItem
+{
+    public string Id { get; set; }
+    public string Name { get; set; }
+    public decimal Price { get; set; }
+}
+```
+
+### IModelList&lt;T&gt;
+
+Contract for paginated responses with sorting and search metadata.
+
+```csharp
+public class ProductList : IModelList<Product>
+{
+    public int TotalCount { get; set; }
+    public int PagesCount { get; set; }
+    public int Page { get; set; }
+    public int Count { get; set; }
+    public string[] SortOrder { get; set; }
+    public string Search { get; set; }
+    public Product[] Items { get; set; }
+}
+```
+
+### ModelItem (obsolete)
+
+> **Obsolete:** implement `IModelItem` instead. `ModelItem` implements `IModelItem` and is kept for backward compatibility.
 
 Base class for entities with a server-assigned unique identifier.
 
@@ -33,7 +66,9 @@ public class Product : ModelItem
 var product = new Product { Id = "abc123", Name = "Widget", Price = 9.99m };
 ```
 
-### ModelList&lt;T&gt;
+### ModelList&lt;T&gt; (obsolete)
+
+> **Obsolete:** implement `IModelList<T>` instead. `ModelList<T>` implements `IModelList<T>` and is kept for backward compatibility.
 
 Paginated response wrapper with sorting and search metadata.
 
@@ -92,13 +127,24 @@ if (ModelList<Product>.IsEmpty(list))
 
 ### ModelListResult
 
-Utility class for creating `ModelList<T>` instances.
+Utility class for creating `IModelList<T>` responses. Pass your own `IModelList<T>` implementation as `TList`.
+
+| Method | Description |
+|--------|-------------|
+| `CreateList<TList, T>(items, totalCount, top, page, sortOrder, search, useSearchMarkup)` | Builds a paginated response; calculates `PagesCount` from `top` and clamps `page` to the last page. With `useSearchMarkup`, wraps search matches in string properties in `<mark>` tags |
+| `SingleItemList<TList, T>(item)` | Wraps a single item with all counts set to 1 |
 
 ```csharp
-// Create a single-item list response
+// Paginated response
+return ModelListResult.CreateList<ProductList, Product>(
+    items, totalCount: 150, top: 20, page: 0, sortOrder: new[] { "+Name" }, search: "widget");
+
+// Single-item response
 var product = await _repository.GetByIdAsync(id);
-return ModelListResult.SingleItemList(product);
+return ModelListResult.SingleItemList<ProductList, Product>(product);
 ```
+
+The overloads without `TList` (`CreateList<T>`, `SingleItemList<T>`) return the obsolete `ModelList<T>` and are obsolete as well.
 
 ### QueryModelAttribute
 

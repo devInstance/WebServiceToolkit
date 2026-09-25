@@ -3,6 +3,9 @@ using DevInstance.WebServiceToolkit.Common.Tools;
 
 namespace DevInstance.WebServiceToolkit.Common.Tests;
 
+// Most tests cover the obsolete ModelList<T>-returning overloads until they are removed.
+#pragma warning disable CS0618
+
 public class ModelListResultTests
 {
     #region Test helpers
@@ -23,6 +26,17 @@ public class ModelListResultTests
     {
         public string Name { get; set; } = string.Empty;
         public int Value { get; set; }
+    }
+
+    private class TestItemList : IModelList<TestItem>
+    {
+        public int TotalCount { get; set; }
+        public int PagesCount { get; set; }
+        public int Page { get; set; }
+        public int Count { get; set; }
+        public string[] SortOrder { get; set; } = Array.Empty<string>();
+        public string Search { get; set; } = string.Empty;
+        public TestItem[] Items { get; set; } = Array.Empty<TestItem>();
     }
 
     #endregion
@@ -436,6 +450,63 @@ public class ModelListResultTests
         Assert.Equal(sortOrder, result.SortOrder);
         Assert.Equal("Item", result.Search);
         Assert.Same(items, result.Items);
+    }
+
+    #endregion
+
+    #region Custom IModelList implementation
+
+    [Fact]
+    public void SingleItemList_Generic_ReturnsRequestedListType()
+    {
+        var item = new TestItem { Name = "Test" };
+
+        TestItemList result = ModelListResult.SingleItemList<TestItemList, TestItem>(item);
+
+        Assert.Single(result.Items);
+        Assert.Same(item, result.Items[0]);
+        Assert.Equal(1, result.Count);
+        Assert.Equal(1, result.TotalCount);
+        Assert.Equal(1, result.PagesCount);
+        Assert.Equal(1, result.Page);
+    }
+
+    [Fact]
+    public void CreateList_Generic_ReturnsRequestedListTypeWithAllFields()
+    {
+        var items = new[]
+        {
+            new TestItem { Name = "Item 1" },
+            new TestItem { Name = "Item 2" }
+        };
+        var sortOrder = new[] { "-Name" };
+
+        TestItemList result = ModelListResult.CreateList<TestItemList, TestItem>(
+            items,
+            totalCount: 100,
+            top: 10,
+            page: 2,
+            sortOrder: sortOrder,
+            search: "Item"
+        );
+
+        Assert.Equal(100, result.TotalCount);
+        Assert.Equal(2, result.Count);
+        Assert.Equal(10, result.PagesCount);
+        Assert.Equal(2, result.Page);
+        Assert.Equal(sortOrder, result.SortOrder);
+        Assert.Equal("Item", result.Search);
+        Assert.Same(items, result.Items);
+    }
+
+    [Fact]
+    public void CreateList_Generic_AppliesSearchMarkup()
+    {
+        var items = new[] { new TestItem { Name = "Hello World" } };
+
+        var result = ModelListResult.CreateList<TestItemList, TestItem>(items, search: "World", useSearchMarkup: true);
+
+        Assert.Equal("Hello <mark>World</mark>", result.Items[0].Name);
     }
 
     #endregion

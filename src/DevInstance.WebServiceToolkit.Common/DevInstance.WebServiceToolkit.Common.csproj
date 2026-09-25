@@ -8,9 +8,9 @@
 		<Copyright>Copyright 2025 - 2026 devInstance LLC</Copyright>
 		<Company>DevInstance LLC</Company>
 		<Authors>Yuriy Frankiv</Authors>
-		<Version>10.2.0</Version>
-		<AssemblyVersion>10.2.0.0</AssemblyVersion>
-		<FileVersion>10.2.0.0</FileVersion>
+		<Version>10.3.0</Version>
+		<AssemblyVersion>10.3.0.0</AssemblyVersion>
+		<FileVersion>10.3.0.0</FileVersion>
 		<Title>WebService Toolkit Common</Title>
 		<PackageIcon>icon.png</PackageIcon>
 		<RepositoryUrl>https://github.com/devInstance/WebServiceToolkit</RepositoryUrl>
@@ -18,7 +18,7 @@
 		<PackageRequireLicenseAcceptance>True</PackageRequireLicenseAcceptance>
 		<GeneratePackageOnBuild>True</GeneratePackageOnBuild>
 		<PackageReadmeFile>README.md</PackageReadmeFile>
-		<Description>Common models and attributes for WebServiceToolkit including ModelItem, ModelList, and query model binding attributes.</Description>
+		<Description>Common models and attributes for WebServiceToolkit including IModelItem, IModelList, and query model binding attributes.</Description>
 
 	</PropertyGroup>
 

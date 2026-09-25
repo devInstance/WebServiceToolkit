@@ -101,9 +101,9 @@ public class ProductsController : ControllerBase
     }
 
     [HttpGet]
-    public Task<ActionResult<ModelList<Product>>> GetProducts(ProductQuery query)
+    public Task<ActionResult<ProductList>> GetProducts(ProductQuery query)
     {
-        return this.HandleWebRequestAsync<ModelList<Product>>(async () =>
+        return this.HandleWebRequestAsync<ProductList>(async () =>
         {
             var products = await _productService.GetProductsAsync(query);
             return Ok(products);
@@ -131,7 +131,7 @@ using DevInstance.WebServiceToolkit.Tools;
 
 public interface IProductService
 {
-    Task<ModelList<Product>> GetProductsAsync(ProductQuery query);
+    Task<ProductList> GetProductsAsync(ProductQuery query);
     Task<Product?> GetByIdAsync(string id);
 }
 
@@ -149,7 +149,7 @@ public class ProductService : IProductService
 - [Exception Handling](docs/exception-handling.md) - HTTP exception types and `ControllerUtils`
 - [Service Registration](docs/service-registration.md) - `[WebService]` and `[WebServiceMock]` attributes
 - [Database Queries](docs/database-queries.md) - `IModelQuery` and related interfaces
-- [Pagination](docs/pagination.md) - `ModelList<T>` for paginated responses
+- [Pagination](docs/pagination.md) - `IModelList<T>` and `ModelListResult` for paginated responses
 
 ## API Reference
 
@@ -157,9 +157,11 @@ public class ProductService : IProductService
 
 | Type | Description |
 |------|-------------|
-| `ModelItem` | Base class with `Id` property for server-assigned identifiers |
-| `ModelList<T>` | Paginated, sortable, searchable collection response DTO |
-| `ModelListResult` | Utility for creating single-item list responses |
+| `IModelItem` | Interface with `Id` property for server-assigned identifiers |
+| `IModelList<T>` | Interface for paginated, sortable, searchable collection responses |
+| `ModelItem` | *Obsolete* — base class implementing `IModelItem` |
+| `ModelList<T>` | *Obsolete* — collection response DTO implementing `IModelList<T>` |
+| `ModelListResult` | Builds `IModelList<T>` responses (`CreateList<TList, T>`, `SingleItemList<TList, T>`) |
 | `QueryModelAttribute` | Marks a class for automatic query parameter binding |
 | `QueryNameAttribute` | Overrides the query parameter name for a property |
 

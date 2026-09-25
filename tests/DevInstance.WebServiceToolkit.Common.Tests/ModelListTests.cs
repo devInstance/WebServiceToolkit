@@ -2,6 +2,9 @@ using DevInstance.WebServiceToolkit.Common.Model;
 
 namespace DevInstance.WebServiceToolkit.Common.Tests;
 
+// Tests cover the obsolete ModelList<T> until it is removed.
+#pragma warning disable CS0618
+
 public class ModelListTests
 {
     private class TestItem
@@ -178,6 +181,27 @@ public class ModelListTests
 
         Assert.Equal(3, result.Items.Length);
         Assert.Equal(3, result.TotalCount);
+    }
+
+    #endregion
+
+    #region Interfaces
+
+    [Fact]
+    public void ModelList_ImplementsIModelList()
+    {
+        IModelList<TestItem> list = ModelList<TestItem>.Single(new TestItem { Name = "A" });
+
+        Assert.Equal(1, list.Count);
+        Assert.Equal("A", list.Items[0].Name);
+    }
+
+    [Fact]
+    public void ModelItem_ImplementsIModelItem()
+    {
+        IModelItem item = new ModelItem { Id = "abc" };
+
+        Assert.Equal("abc", item.Id);
     }
 
     #endregion

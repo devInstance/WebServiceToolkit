@@ -62,7 +62,7 @@ Use in controllers - binding happens automatically:
 
 ```csharp
 [HttpGet]
-public ActionResult<ModelList<Product>> GetProducts(ProductQuery query)
+public ActionResult<ProductList> GetProducts(ProductQuery query)
 {
     // query is populated from ?page=0&pageSize=20&search=widget&sort=name
 }

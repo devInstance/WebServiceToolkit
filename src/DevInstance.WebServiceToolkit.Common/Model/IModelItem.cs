@@ -1,14 +1,11 @@
-﻿using System;
-
 namespace DevInstance.WebServiceToolkit.Common.Model;
 
 /// <summary>
-/// Base class for model entities that have a server-assigned unique identifier.
-/// Obsolete: implement <see cref="IModelItem"/> instead.
+/// Contract for model entities that have a server-assigned unique identifier.
 /// </summary>
 /// <remarks>
 /// <para>
-/// Inherit from this class when creating DTOs (Data Transfer Objects) that represent
+/// Implement this interface on DTOs (Data Transfer Objects) that represent
 /// entities with a unique identifier managed by the server.
 /// </para>
 /// <para>
@@ -18,15 +15,15 @@ namespace DevInstance.WebServiceToolkit.Common.Model;
 /// </remarks>
 /// <example>
 /// <code>
-/// public class Product : ModelItem
+/// public class Product : IModelItem
 /// {
+///     public string Id { get; set; }
 ///     public string Name { get; set; }
 ///     public decimal Price { get; set; }
 /// }
 /// </code>
 /// </example>
-[Obsolete("ModelItem is obsolete and will be removed in a future version. Implement IModelItem on your model classes instead.")]
-public class ModelItem : IModelItem
+public interface IModelItem
 {
     /// <summary>
     /// Gets or sets the unique public identifier assigned by the server.
@@ -35,5 +32,5 @@ public class ModelItem : IModelItem
     /// A string representing the unique identifier. This value is typically
     /// assigned by the server when creating a new record.
     /// </value>
-    public string Id { get; set; }
+    string Id { get; set; }
 }

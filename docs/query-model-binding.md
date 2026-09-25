@@ -27,7 +27,7 @@ public class ProductQuery
 
 ```csharp
 [HttpGet]
-public ActionResult<ModelList<Product>> GetProducts(ProductQuery query)
+public ActionResult<ProductList> GetProducts(ProductQuery query)
 {
     // query.Page, query.PageSize, query.Search are automatically populated
     // from ?page=0&pageSize=20&search=widget
@@ -164,7 +164,7 @@ When binding fails, errors are added to ModelState. You can check for validation
 
 ```csharp
 [HttpGet]
-public ActionResult<ModelList<Product>> GetProducts(ProductQuery query)
+public ActionResult<ProductList> GetProducts(ProductQuery query)
 {
     if (!ModelState.IsValid)
     {

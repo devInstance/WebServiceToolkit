@@ -4,6 +4,7 @@ namespace DevInstance.WebServiceToolkit.Common.Model;
 
 /// <summary>
 /// Represents a paginated, sortable, and searchable collection response.
+/// Obsolete: implement <see cref="IModelList{T}"/> instead.
 /// </summary>
 /// <typeparam name="T">The type of items contained in the list.</typeparam>
 /// <remarks>
@@ -31,7 +32,8 @@ namespace DevInstance.WebServiceToolkit.Common.Model;
 /// };
 /// </code>
 /// </example>
-public class ModelList<T>
+[Obsolete("ModelList<T> is obsolete and will be removed in a future version. Implement IModelList<T> on your response classes instead.")]
+public class ModelList<T> : IModelList<T>
 {
     /// <summary>
     /// Gets or sets the total count of items across all pages.
