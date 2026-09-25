@@ -1,4 +1,4 @@
-# WebServiceToolkit
+﻿# WebServiceToolkit
 
 WebServiceToolkit is a .NET library designed to simplify the development of ASP.NET Core web services. It provides utilities for query model binding, standardized exception handling, dependency injection patterns, and paginated response models.
 
@@ -174,6 +174,10 @@ public class ProductService : IProductService
 | `RecordNotFoundException` | Throws HTTP 404 Not Found |
 | `RecordConflictException` | Throws HTTP 409 Conflict |
 | `UnauthorizedException` | Throws HTTP 401 Unauthorized |
+| `ForbiddenException` | Throws HTTP 403 Forbidden |
+| `UnprocessableEntityException` | Throws HTTP 422 Unprocessable Entity |
+| `WebServiceException` | Base class: any subclass maps to its own `StatusCode` |
+| `WebServiceError` | JSON body of every error response (compatible with BlazorToolkit `ServiceActionError`) |
 | `ControllerUtils` | Exception handling wrapper for controller actions |
 | `WebServiceAttribute` | Marks class for automatic DI registration |
 | `WebServiceMockAttribute` | Marks mock implementation for testing scenarios |

@@ -1,4 +1,4 @@
-# DevInstance.WebServiceToolkit
+﻿# DevInstance.WebServiceToolkit
 
 ASP.NET Core utilities for web service development including query model binding, exception handling, and service registration.
 
@@ -91,13 +91,36 @@ public Task<ActionResult<Product>> GetProduct(string id)
 
 **Exception to HTTP Status Mapping:**
 
-| Exception | HTTP Status |
-|-----------|-------------|
-| `RecordNotFoundException` | 404 Not Found |
-| `RecordConflictException` | 409 Conflict |
-| `UnauthorizedException` | 401 Unauthorized |
-| `BadRequestException` | 400 Bad Request |
-| Other exceptions | 500 with Problem Details |
+| Exception | HTTP Status | `errorType` |
+|-----------|-------------|-------------|
+| `BadRequestException` | 400 Bad Request | Validation |
+| `UnauthorizedException` | 401 Unauthorized | General |
+| `ForbiddenException` | 403 Forbidden | General |
+| `RecordNotFoundException` | 404 Not Found | General |
+| `RecordConflictException` | 409 Conflict | General |
+| `UnprocessableEntityException` | 422 Unprocessable Entity | Validation |
+| Any other `WebServiceException` | its `StatusCode` | General |
+| Other exceptions | 500 — message hidden outside Development, stack trace never sent | Exception |
+
+Every error response carries a `WebServiceError` JSON body:
+
+```json
+{ "errorType": 3, "message": "Name is required", "propertyName": "Name" }
+```
+
+It is wire-compatible with DevInstance.BlazorToolkit's `ServiceActionError`, so Blazor clients
+using `HttpApiContext` read the message and property name directly. Derive your own domain
+exceptions from `WebServiceException` (or a concrete exception) to control their status code.
+
+To give `[ApiController]` model-validation failures the same body, register:
+
+```csharp
+builder.Services.AddControllers()
+    .AddWebServiceToolkitErrors();
+```
+
+A global `IExceptionHandler` can produce the same body for exceptions thrown outside
+`HandleWebRequestAsync` via `ControllerUtils.ToWebServiceError(exception)`.
 
 ### 4. Service Registration
 

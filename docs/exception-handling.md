@@ -1,17 +1,24 @@
-# Exception Handling
+﻿# Exception Handling
 
 WebServiceToolkit provides standardized exception types that automatically map to HTTP status codes when used with `ControllerUtils`.
 
 ## Overview
 
-The toolkit includes four exception types for common HTTP error scenarios:
+All toolkit exceptions derive from `WebServiceException`, which carries the HTTP status code:
 
 | Exception | HTTP Status | Use Case |
 |-----------|-------------|----------|
-| `BadRequestException` | 400 | Invalid request data |
+| `BadRequestException` | 400 | Invalid request data (optionally names the property) |
 | `UnauthorizedException` | 401 | Authentication failed |
+| `ForbiddenException` | 403 | Authenticated, but not allowed |
 | `RecordNotFoundException` | 404 | Resource not found |
 | `RecordConflictException` | 409 | Resource conflict |
+| `UnprocessableEntityException` | 422 | Business rule violated (optionally names the property) |
+| your own `WebServiceException` subclass | any | Domain-specific status |
+
+Every error response has a `WebServiceError` JSON body — `{ errorType, message, propertyName }` —
+wire-compatible with DevInstance.BlazorToolkit's `ServiceActionError`. `errorType` is `Validation`
+(3) for 400/422, `General` (2) for other handled errors, and `Exception` (1) for 500.
 
 ## Using ControllerUtils
 
@@ -150,24 +157,46 @@ HandleWebRequestAsync
 
             │                         │                         │
             ▼                         ▼                         ▼
-    Unauthorized              Other Exception
-         │                         │
-         ▼                         ▼
-    401 Unauthorized       500 with Problem Details
+    Unauthorized /            Other Exception
+    Forbidden / 422 /              │
+    other WebServiceException      ▼
+         │                   500 (no stack trace)
+         ▼
+    its StatusCode
+
+    Every error response body is a WebServiceError.
 ```
 
 ## Unhandled Exceptions
 
-Exceptions not matching the known types are converted to a 500 response with Problem Details:
+Exceptions that are not a `WebServiceException` are logged as errors and converted to a 500
+response. The body never contains the stack trace; the exception message is included only when
+the host environment is Development, otherwise it is `"An unexpected error occurred."`:
 
-```csharp
-catch (Exception ex)
-{
-    return controller.Problem(detail: ex.StackTrace, title: ex.Message);
-}
+```json
+{ "errorType": 1, "message": "An unexpected error occurred.", "propertyName": null }
 ```
 
-This follows the [RFC 7807](https://tools.ietf.org/html/rfc7807) Problem Details standard.
+## Model Validation Errors
+
+`[ApiController]` rejects invalid models before the action runs. Register
+`AddWebServiceToolkitErrors()` so those 400 responses also use `WebServiceError`
+(the first invalid property becomes `propertyName`):
+
+```csharp
+builder.Services.AddControllers().AddWebServiceToolkitErrors();
+```
+
+## Global Exception Handlers
+
+For exceptions thrown outside `HandleWebRequestAsync` (middleware, filters), an
+`IExceptionHandler` can produce the identical body:
+
+```csharp
+var (status, error) = ControllerUtils.ToWebServiceError(exception, env.IsDevelopment());
+httpContext.Response.StatusCode = status;
+await httpContext.Response.WriteAsJsonAsync(error);
+```
 
 ## Best Practices
 

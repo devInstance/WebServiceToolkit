@@ -24,12 +24,12 @@
 /// </code>
 /// </example>
 /// <seealso cref="Controllers.ControllerUtils"/>
-public class RecordConflictException : Exception
+public class RecordConflictException : WebServiceException
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordConflictException"/> class.
     /// </summary>
-    public RecordConflictException()
+    public RecordConflictException() : base(409, "Record conflict")
     {
     }
 
@@ -37,7 +37,7 @@ public class RecordConflictException : Exception
     /// Initializes a new instance of the <see cref="RecordConflictException"/> class with a specified message.
     /// </summary>
     /// <param name="message">A description of the conflict.</param>
-    public RecordConflictException(string message) : base($"Record conflict: {message}")
+    public RecordConflictException(string message) : base(409, $"Record conflict: {message}")
     {
     }
 }

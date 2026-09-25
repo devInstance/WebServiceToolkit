@@ -23,12 +23,12 @@
 /// </code>
 /// </example>
 /// <seealso cref="Controllers.ControllerUtils"/>
-public class UnauthorizedException : Exception
+public class UnauthorizedException : WebServiceException
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="UnauthorizedException"/> class.
     /// </summary>
-    public UnauthorizedException()
+    public UnauthorizedException() : base(401, "Unauthorized")
     {
     }
 
@@ -36,7 +36,7 @@ public class UnauthorizedException : Exception
     /// Initializes a new instance of the <see cref="UnauthorizedException"/> class with a specified message.
     /// </summary>
     /// <param name="message">A description of why authentication failed.</param>
-    public UnauthorizedException(string message) : base($"Unauthorized: {message}")
+    public UnauthorizedException(string message) : base(401, $"Unauthorized: {message}")
     {
     }
 }

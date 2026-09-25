@@ -22,12 +22,12 @@
 /// </code>
 /// </example>
 /// <seealso cref="Controllers.ControllerUtils"/>
-public class BadRequestException : Exception
+public class BadRequestException : WebServiceException
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="BadRequestException"/> class.
     /// </summary>
-    public BadRequestException()
+    public BadRequestException() : base(400, "Bad request")
     {
     }
 
@@ -35,7 +35,16 @@ public class BadRequestException : Exception
     /// Initializes a new instance of the <see cref="BadRequestException"/> class with a specified error message.
     /// </summary>
     /// <param name="message">The error message that explains the reason for the exception.</param>
-    public BadRequestException(string message) : base(message)
+    public BadRequestException(string message) : base(400, message)
+    {
+    }
+
+    /// <summary>
+    /// Initializes a new instance of the <see cref="BadRequestException"/> class for a specific request property.
+    /// </summary>
+    /// <param name="message">The error message that explains the reason for the exception.</param>
+    /// <param name="propertyName">The name of the request property that is invalid.</param>
+    public BadRequestException(string message, string propertyName) : base(400, message, propertyName)
     {
     }
 }

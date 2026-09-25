@@ -23,12 +23,12 @@
 /// </code>
 /// </example>
 /// <seealso cref="Controllers.ControllerUtils"/>
-public class RecordNotFoundException : Exception
+public class RecordNotFoundException : WebServiceException
 {
     /// <summary>
     /// Initializes a new instance of the <see cref="RecordNotFoundException"/> class.
     /// </summary>
-    public RecordNotFoundException()
+    public RecordNotFoundException() : base(404, "Record not found")
     {
     }
 
@@ -36,7 +36,7 @@ public class RecordNotFoundException : Exception
     /// Initializes a new instance of the <see cref="RecordNotFoundException"/> class with a specified identifier.
     /// </summary>
     /// <param name="message">The identifier or description of the resource that was not found.</param>
-    public RecordNotFoundException(string message) : base($"Record not found: {message}")
+    public RecordNotFoundException(string message) : base(404, $"Record not found: {message}")
     {
     }
 }

@@ -1,6 +1,8 @@
 ﻿using DevInstance.LogScope;
 using DevInstance.WebServiceToolkit.Exceptions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 
 namespace DevInstance.WebServiceToolkit.Controllers;
 
@@ -13,12 +15,18 @@ namespace DevInstance.WebServiceToolkit.Controllers;
 /// automatically converting domain exceptions to appropriate HTTP status codes:
 /// </para>
 /// <list type="bullet">
+/// <item><description><see cref="BadRequestException"/> maps to HTTP 400 Bad Request</description></item>
+/// <item><description><see cref="UnauthorizedException"/> maps to HTTP 401 Unauthorized</description></item>
+/// <item><description><see cref="ForbiddenException"/> maps to HTTP 403 Forbidden</description></item>
 /// <item><description><see cref="RecordNotFoundException"/> maps to HTTP 404 Not Found</description></item>
 /// <item><description><see cref="RecordConflictException"/> maps to HTTP 409 Conflict</description></item>
-/// <item><description><see cref="UnauthorizedException"/> maps to HTTP 401 Unauthorized</description></item>
-/// <item><description><see cref="BadRequestException"/> maps to HTTP 400 Bad Request</description></item>
-/// <item><description>Other exceptions map to HTTP 500 with problem details</description></item>
+/// <item><description><see cref="UnprocessableEntityException"/> maps to HTTP 422 Unprocessable Entity</description></item>
+/// <item><description>Any other <see cref="WebServiceException"/> maps to its own <see cref="WebServiceException.StatusCode"/></description></item>
+/// <item><description>Other exceptions map to HTTP 500; the message is only exposed in Development and the stack trace never is</description></item>
 /// </list>
+/// <para>
+/// Every error response carries a <see cref="WebServiceError"/> JSON body.
+/// </para>
 /// </remarks>
 /// <example>
 /// <code>
@@ -49,10 +57,64 @@ public static class ControllerUtils
     /// <returns>A task representing the asynchronous operation, containing an action result with a value of type <typeparamref name="T"/>.</returns>
     public delegate Task<ActionResult<T>> WebHandlerAsync<T>();
 
-    private static ActionResult<T> HandleException<T>(ControllerBase controller, Exception ex, IScopeLog log)
+    /// <summary>
+    /// Message returned to the client for unhandled exceptions outside Development.
+    /// </summary>
+    public const string UnexpectedErrorMessage = "An unexpected error occurred.";
+
+    /// <summary>
+    /// Converts an exception into an error response with a <see cref="WebServiceError"/> body.
+    /// </summary>
+    /// <remarks>
+    /// <para>
+    /// A <see cref="WebServiceException"/> responds with its own status code and message.
+    /// Any other exception is logged as an error and responds with 500; its message is only
+    /// included when the host environment is Development, and the stack trace is never sent.
+    /// </para>
+    /// <para>
+    /// Public so that a global exception handler (<c>IExceptionHandler</c>) can produce the
+    /// same body for exceptions thrown outside <see cref="HandleWebRequestAsync{T}"/>.
+    /// </para>
+    /// </remarks>
+    /// <param name="exception">The exception to convert.</param>
+    /// <param name="includeUnhandledMessage">Whether to expose the message of a non-<see cref="WebServiceException"/>.</param>
+    /// <returns>The HTTP status code and error body.</returns>
+    public static (int StatusCode, WebServiceError Error) ToWebServiceError(Exception exception, bool includeUnhandledMessage = false)
     {
-        log.E(ex);
-        return controller.Problem(detail: ex.StackTrace, title: ex.Message);
+        if (exception is WebServiceException wse)
+        {
+            return (wse.StatusCode, new WebServiceError
+            {
+                ErrorType = wse.StatusCode is 400 or 422 ? WebServiceErrorType.Validation : WebServiceErrorType.General,
+                Message = wse.Message,
+                PropertyName = wse.PropertyName
+            });
+        }
+
+        return (500, new WebServiceError
+        {
+            ErrorType = WebServiceErrorType.Exception,
+            Message = includeUnhandledMessage ? exception.Message : UnexpectedErrorMessage
+        });
+    }
+
+    private static ObjectResult ToErrorResult(ControllerBase controller, Exception ex, IScopeLog? log)
+    {
+        var isDevelopment = controller.HttpContext?.RequestServices?
+            .GetService<IHostEnvironment>()?.IsDevelopment() ?? false;
+
+        var (statusCode, error) = ToWebServiceError(ex, isDevelopment);
+
+        if (statusCode >= 500)
+        {
+            log?.E(ex);
+        }
+        else
+        {
+            log?.I($"{ex.GetType().Name}: {ex.Message}");
+        }
+
+        return controller.StatusCode(statusCode, error);
     }
 
     /// <summary>
@@ -81,35 +143,15 @@ public static class ControllerUtils
     /// }
     /// </code>
     /// </example>
-    public static async Task<ActionResult<T>> HandleWebRequestAsync<T>(this ControllerBase controller, WebHandlerAsync<T> handler, IScopeLog log = null)
+    public static async Task<ActionResult<T>> HandleWebRequestAsync<T>(this ControllerBase controller, WebHandlerAsync<T> handler, IScopeLog? log = null)
     {
         try
         {
             return await handler();
         }
-        catch (RecordNotFoundException)
-        {
-            log.I("Request not found");
-            return controller.NotFound();
-        }
-        catch (RecordConflictException)
-        {
-            log.I("Record conflict request");
-            return controller.Conflict();
-        }
-        catch (UnauthorizedException ex)
-        {
-            log.I("Unauthorized request");
-            return controller.Unauthorized(ex.Message);
-        }
-        catch (BadRequestException ex)
-        {
-            log.I("Bad request");
-            return controller.BadRequest(ex.Message);
-        }
         catch (Exception ex)
         {
-            return HandleException<T>(controller, ex, log);
+            return ToErrorResult(controller, ex, log);
         }
     }
 
@@ -138,35 +180,15 @@ public static class ControllerUtils
     /// }
     /// </code>
     /// </example>
-    public static ActionResult<T> HandleWebRequest<T>(this ControllerBase controller, WebHandler<T> handler, IScopeLog log = null)
+    public static ActionResult<T> HandleWebRequest<T>(this ControllerBase controller, WebHandler<T> handler, IScopeLog? log = null)
     {
         try
         {
             return handler();
         }
-        catch (RecordNotFoundException)
-        {
-            log.I("Request not found");
-            return controller.NotFound();
-        }
-        catch (RecordConflictException)
-        {
-            log.I("Record conflict request");
-            return controller.Conflict();
-        }
-        catch (UnauthorizedException ex)
-        {
-            log.I("Unauthorized request");
-            return controller.Unauthorized(ex.Message);
-        }
-        catch (BadRequestException ex)
-        {
-            log.I("Bad request");
-            return controller.BadRequest(ex.Message);
-        }
         catch (Exception ex)
         {
-            return HandleException<T>(controller, ex, log);
+            return ToErrorResult(controller, ex, log);
         }
     }
 }
