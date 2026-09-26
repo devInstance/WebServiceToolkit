@@ -158,9 +158,15 @@ public static class QueryModelBinder
             return true;
         }
 
-        // IEnumerable<T> (e.g., List<T>, IEnumerable<T>, ICollection<T>)
-        var ienum = type.GetInterfaces()
-            .FirstOrDefault(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IEnumerable<>));
+        // string implements IEnumerable<char> but is a scalar here; treating it as a collection
+        // splits "abc" into chars and fails to assign char[] to the string property.
+        if (type == typeof(string)) return false;
+
+        // IEnumerable<T> (e.g., List<T>, IEnumerable<T>, ICollection<T>). GetInterfaces() on an
+        // interface type does not include the type itself, so check it first.
+        var ienum = IsGenericEnumerable(type)
+            ? type
+            : type.GetInterfaces().FirstOrDefault(IsGenericEnumerable);
 
         if (ienum is null) return false;
 
@@ -183,6 +189,9 @@ public static class QueryModelBinder
         };
         return true;
     }
+
+    private static bool IsGenericEnumerable(Type t) =>
+        t.IsGenericType && t.GetGenericTypeDefinition() == typeof(IEnumerable<>);
 
     private static object? ConvertOne(string raw, Type targetType, string param)
     {
